@@ -62,7 +62,7 @@ class Layout {
     return `
       <nav class="nav" id="layout-nav">
         <a class="nav-logo" data-navigate="index">
-          <img src="../../images/logo.svg" alt="Space Z" />
+          <img src="https://raw.githubusercontent.com/Inseliq/kosmos/6dd4aed688a4d2cfa7850f80fb57f8a90813d3c2/Web/images/logo.svg" alt="Space Z" />
           <span>SPACE<em>Z</em></span>
         </a>
 
