@@ -33,6 +33,7 @@
       this.pages = new Map();
       this.current = null;
       this.loader = createLoader();
+      this._pagesReady = false; // флаг: все модули загружены
 
       this._setupRouter();
       this._loadPages();
@@ -67,14 +68,18 @@
       const PageClass = this.pages.get(path);
 
       if (!PageClass) {
-        // Fallback → index
-        if (path !== 'index') { this.navigate('index'); }
+        // Модули ещё не загружены — _loadPages сам вызовет _render после.
+        // Если модули уже готовы — страница реально не существует → на главную.
+        if (this._pagesReady) {
+          console.warn(`[Assembler] Unknown route: "${path}" → redirect to /index`);
+          history.replaceState({}, '', '/index');
+          this._render('index');
+        }
         return;
       }
 
       this._showLoader('ПЕРЕХОД');
 
-      // Destroy current page if needed
       if (this.current && typeof this.current.destroy === 'function') {
         this.current.destroy();
       }
@@ -91,13 +96,10 @@
     }
 
     _setupRouter() {
-      // Browser back/forward
       window.addEventListener('popstate', () => {
-        const path = this._currentPath();
-        this._render(path);
+        this._render(this._currentPath());
       });
 
-      // Intercept [data-navigate] clicks anywhere in the document
       document.addEventListener('click', (e) => {
         const link = e.target.closest('[data-navigate]');
         if (link) {
@@ -108,7 +110,10 @@
     }
 
     _currentPath() {
-      return window.location.pathname.replace(/^\//, '').replace(/\.html$/, '') || 'index';
+      return window.location.pathname
+        .replace(/^\//, '')
+        .replace(/\.html$/, '')
+        || 'index';
     }
 
     _loadPages() {
@@ -130,13 +135,14 @@
           s.src = base + src;
           s.defer = true;
           s.onload = resolve;
-          s.onerror = resolve; // skip missing — don't block
+          s.onerror = resolve; // пропускаем отсутствующие — не блокируем
           document.head.appendChild(s);
         });
 
       this._showLoader('ИНИЦИАЛИЗАЦИЯ');
 
       Promise.all(modules.map(load)).then(() => {
+        this._pagesReady = true;          // ← все модули загружены
         const path = this._currentPath();
         this._render(path);
       });
