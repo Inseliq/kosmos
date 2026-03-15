@@ -104,7 +104,7 @@ class Layout {
       <footer class="footer">
         <div class="footer-inner">
           <a class="footer-logo" data-navigate="index">
-            <img src="./Web/images/logo.svg" alt="Space Z" />
+            <img src="https://raw.githubusercontent.com/Inseliq/kosmos/6dd4aed688a4d2cfa7850f80fb57f8a90813d3c2/Web/images/logo.svg" alt="Space Z" />
             <span>SPACE<em>Z</em></span>
           </a>
 
